@@ -1,18 +1,25 @@
 from langchain_ollama import OllamaLLM
 from mycustomLLM import LLM
 class agents(object):
-    def __init__(self, age:int, gender: str, country:str, job:str, interest:str):
+    def __init__(self, age:int, gender: str, nationality:str, job:str, interest:str, location:str, politicalcompass:str):
         self.age = age
         self.gender= gender
-        self.country = country
+        self.nationality = nationality
         self.job = job
         self.interest = interest
+        self.location = location
+        self.politicalcompass = politicalcompass    
         self.memory=[]
         self.LLM=LLM(model=OllamaLLM(model="llama3.2"))
     def tweet(self)->str:
-        standardtweet="""Please make a twitter tweet according to your background and memory.
-                      The tweet should be in english. Remember tweets have a maximum of 280 characters
-                      and usually they use hashtags # and mentions @. """
+        standardtweet="""This is your prompt: Please make a twitter tweet according to your background and memory.
+                      The tweet should be in english. The tweet should make sense according to your memory.
+                      Tweet like you are a heavy twitter user so dont focus too much on your background in each single tweet.
+
+                      Remember tweets have a maximum of 280 characters
+                      and usually they use hashtags # and mentions @. 
+                      Just post the tweet and nothing else. Nothing preeceding or following the tweet."""
+        return self.prompt(standardtweet)
     def prompt(self, text)->str:
 
         total=""
@@ -28,7 +35,8 @@ class agents(object):
         return result
     
     def setbackground(self):
-        backgroundtext="This is your background. You are a " +str(self.age)+ " years old, your gender is "+self.gender+" you are from "+self.country+" and your job is "+self.job+" your interest is "+self.interest
+        backgroundtext="This is your background. You are a " +str(self.age)+ " years old, your gender is "+self.gender+" youre nationality is "+self.nationality+" and your job is "+self.job+" your interest is "+self.interest
+        backgroundtext=backgroundtext+" You are currently located in "+self.location+" and your political compass is "+self.politicalcompass
         self.add_memory(backgroundtext)
 
     def add_memory(self, text:str):
