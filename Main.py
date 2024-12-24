@@ -59,8 +59,9 @@ def showtweettoagent(tweet:str,agent:agents,tweetandlikes:dict):
 
 database.createdatatables()
 createagents()
-
-
+for agent in agentlist:
+    for i in range(20):
+        agent.decidesandtweets()
 # for key in tulfirstuser.keys():
 #     showtweettoagent(key,seconduser,tulfirstuser)
 #     print(tulfirstuser[key])

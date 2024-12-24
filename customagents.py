@@ -1,6 +1,7 @@
 from langchain_ollama import OllamaLLM
 from mycustomLLM import LLM
 import sqlite3
+import random
 class agents(object):
     def __init__(self,userid:int, age:int, gender: str, nationality:str, job:str, interest:str, location:str, politicalcompass:str):
         self.userid=userid
@@ -48,23 +49,26 @@ class agents(object):
         self.add_memory(result) #add output to memory
         return result
     
+    # #almost no tweets with this prompt so adapting: According to your background and your recent twitter behavior, decide if you want to tweet something or not. 
+    #             The likelyhood of tweeting should be around 10%.
+    #             The more often you dont tweet the more likely you should tweet.
+    #             If you decide to tweet, just answer with 'tweet' if you decide not to tweet answer with 'dont tweet'
+    #             Dont return anything else your answer should really just be 'tweet' or 'dont tweet'.
+
+
     def decidesandtweets(self):
         conn = sqlite3.connect('twitter.db')
         c = conn.cursor()
-        question="""According to your background and your recent twitter behavior, decide if you want to tweet something or not. 
-                The likelyhood of tweeting should be around 10%.
-                The more often you dont tweet the more likely you should tweet.
-                If you decide to tweet, just answer with 'tweet' if you decide not to tweet answer with 'dont tweet'
-                Dont return anything else your answer should really just be 'tweet' or 'dont tweet'."""
-        res = self.LLM.prompt(question)
-        #if res is tweet then tweet it and add to database
-        if res=="tweet":
+
+        if random.random()<=0.4:
             tweet=self.tweet()
             #get the highest tweetid and add 1 to it to get the new tweetid
-            tweetid=c.execute("SELECT MAX(tweet_id) FROM tweets").fetchone()[0]+1
+            tweetid=c.execute("SELECT MAX(tweet_id) FROM tweets").fetchone()[0]
+            if tweetid==None:
+                tweetid=-1
+            tweetid+=1
             #add tweet to database
-            c.execute("INSERT INTO tweets Values (:tweet_id, :user_id, :tweettext, :likes",
-                  {'tweet_id':tweetid,'user_id':self.userid,'tweettext':tweet,'likes':0})
+            c.execute("INSERT INTO tweets Values (:tweet_id, :user_id, :tweettext, :likes)",{'tweet_id':tweetid,'user_id':self.userid,'tweettext':tweet,'likes':0})
         conn.commit()
         
         

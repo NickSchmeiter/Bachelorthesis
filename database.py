@@ -4,6 +4,7 @@ def createdatatables():
     #database creation test
 
     conn = sqlite3.connect('twitter.db')
+    #conn = sqlite3.connect(':memory:')
 
     c = conn.cursor()
 
