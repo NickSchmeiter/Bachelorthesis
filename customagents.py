@@ -88,8 +88,21 @@ class agents(object):
         prompt="""This is your prompt: Please evaluate the tweet which will follow after this prompt.
                   You should evaluate if you would give the tweet a like from a twitter user perspective.
                   remember your background and memory and evaluate the tweet according to that.
+                  You can like each tweet just once if you have seen this tweet before please ignore it and dont like it.
                   If you would like the tweet, just return 'like' if you would not like the tweet return 'dislike'
                   Dont return anything else your answer should really just be 'like' or 'dislike'.
                   HERE COMES THE TWEET: \n"""
         prompt=prompt+tweet
         return self.prompt(prompt)
+    
+    def showalltweetstoagentandlikes(self):
+        conn = sqlite3.connect('twitter.db')
+        c = conn.cursor()
+        tweetlist = c.execute("SELECT tweet_id, tweettext, likes FROM tweets WHERE user_id != :user_id", {'user_id': self.userid}).fetchall()
+        for tweet in tweetlist:
+            tweet_id, tweettext, likes = tweet
+            if self.evaluatetweet(tweettext) == "like":
+                new_likes = likes + 1
+                c.execute("UPDATE tweets SET likes = :new_likes WHERE tweet_id = :tweet_id", {'new_likes': new_likes, 'tweet_id': tweet_id})
+                conn.commit()
+        conn.close()

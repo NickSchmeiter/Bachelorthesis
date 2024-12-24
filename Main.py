@@ -52,21 +52,29 @@ def createagents():
 
 
 
-def showtweettoagent(tweet:str,agent:agents,tweetandlikes:dict):
-    if agent.evaluatetweet(tweet)=="like":
-        tweetandlikes[tweet]+=1
+def showalltweetstoagentandlikes(agent:agents):
+    conn = sqlite3.connect('twitter.db')
+    c = conn.cursor()
+    tweetlist = c.execute("SELECT tweet_id, tweettext, likes FROM tweets WHERE user_id != :user_id", {'user_id': agent.userid}).fetchall()
+    for tweet in tweetlist:
+        tweet_id, tweettext, likes = tweet
+        if agent.evaluatetweet(tweettext) == "like":
+            new_likes = likes + 1
+            c.execute("UPDATE tweets SET likes = :new_likes WHERE tweet_id = :tweet_id", {'new_likes': new_likes, 'tweet_id': tweet_id})
+            conn.commit()
+    conn.close()
+
+def main():
+    database.createdatatables()
+    createagents()
+    days=2
+    for agent in agentlist:
+        for i in range(5*days):
+            agent.decidesandtweets()
+    for agent in agentlist:
+        agent.showalltweetstoagentandlikes()
 
 
-database.createdatatables()
-createagents()
-for agent in agentlist:
-    for i in range(20):
-        agent.decidesandtweets()
-# for key in tulfirstuser.keys():
-#     showtweettoagent(key,seconduser,tulfirstuser)
-#     print(tulfirstuser[key])
-
-#show all tweets to first user and get likes or dislikes
-
+main()
 
     
