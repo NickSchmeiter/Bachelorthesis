@@ -1,7 +1,7 @@
 from mycustomLLM import LLM
 from langchain_ollama import OllamaLLM
 from customagents import agents
-import sqlite3
+import database
 
 
 
@@ -26,31 +26,25 @@ import sqlite3
 # sowohl mehr research als auch frei schnautze probieren. 
 #  
 
-#database creation test
-
-conn = sqlite3.connect('twitter.db')
-
-c = conn.cursor()
-
-"""c.execute(""CREATE TABLE tweets (
-            tweet_id integer primary key,
-            user_id integer,
-            tweet text,
-            likes integer
-            )"")"""
-
-c.execute("""INSERT INTO tweets VALUES ('1','2','This is a test tweet', '0')""")
-conn.commit()
-conn.close()
-
-
-tulfirstuser={}
-tulseconduser={}
-
+ageslist=[26,27]
+genderlist=["male","female"]
+nationalitylist=["Germany","half italian, quarter japanese, quarter peruvian"]
+joblist=["computer science student","marketing at edgless systems(Berliner startup for cybersecurity)"]
+interestlist=["Skateboarding","books, food, photography"]
+locationlist=["Berlin","Berlin"]
+politicalcompasslist=["leftliberal","leftliberal"]
 
 def showtweettoagent(tweet:str,agent:agents,tweetandlikes:dict):
     if agent.evaluatetweet(tweet)=="like":
         tweetandlikes[tweet]+=1
+
+
+database.createdatatables()
+tulfirstuser={}
+tulseconduser={}
+
+
+
 
 firstuser=agents(age=26,gender='male',nationality='Germany',job='computer science student',
                  interest='Skateboarding',location='Berlin',politicalcompass='leftliberal')

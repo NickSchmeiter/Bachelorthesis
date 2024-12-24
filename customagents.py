@@ -1,7 +1,8 @@
 from langchain_ollama import OllamaLLM
 from mycustomLLM import LLM
 class agents(object):
-    def __init__(self, age:int, gender: str, nationality:str, job:str, interest:str, location:str, politicalcompass:str):
+    def __init__(self,userid:int, age:int, gender: str, nationality:str, job:str, interest:str, location:str, politicalcompass:str):
+        self.userid=userid
         self.age = age
         self.gender= gender
         self.nationality = nationality
