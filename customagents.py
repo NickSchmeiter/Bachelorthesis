@@ -93,7 +93,11 @@ class agents(object):
                   Dont return anything else your answer should really just be 'like' or 'dislike'.
                   HERE COMES THE TWEET: \n"""
         prompt=prompt+tweet
-        return self.prompt(prompt)
+        res=self.prompt(prompt)
+        while len(res)>7:
+            res=self.prompt('your answer was too long please return just "like" or "dislike"')
+
+        return res
     
     def showalltweetstoagentandlikes(self):
         conn = sqlite3.connect('twitter.db')
