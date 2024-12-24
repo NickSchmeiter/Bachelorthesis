@@ -14,6 +14,7 @@ def createdatatables():
     c.execute("""CREATE TABLE users (
             user_id integer primary key,
             age integer,
+            gender text,
             nationality text,
             job text,
             interest text,

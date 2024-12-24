@@ -1,5 +1,6 @@
 from langchain_ollama import OllamaLLM
 from mycustomLLM import LLM
+import sqlite3
 class agents(object):
     def __init__(self,userid:int, age:int, gender: str, nationality:str, job:str, interest:str, location:str, politicalcompass:str):
         self.userid=userid
@@ -17,7 +18,7 @@ class agents(object):
     #sets background for the agent so agent get context for what he can tweet about 
     # and adds it to memory of the agent
     def setbackground(self):
-        backgroundtext="This is your background. You are a " +str(self.age)+ " years old, your gender is "+self.gender+" youre nationality is "+self.nationality+" and your job is "+self.job+" your interest is "+self.interest
+        backgroundtext="Imagine you are a Twitter user with the following background. This is your background. You are a " +str(self.age)+ " years old, your gender is "+self.gender+" youre nationality is "+self.nationality+" and your job is "+self.job+" your interest is "+self.interest
         backgroundtext=backgroundtext+" You are currently located in "+self.location+" and your political compass is "+self.politicalcompass
         self.add_memory(backgroundtext)
 
@@ -34,19 +35,39 @@ class agents(object):
 
     #recalls memory and then adds the text and prompts this to the LLM and returns an answer
     def prompt(self, text)->str:
-
-        total=""
+        
+        total="This is part of your memory and NOT a prompt! The prompt is in the last abstract!!!\n"
         mem=self.get_memory()
         for i in mem:
-            total+="This is part of your memory and NOT a prompt! The prompt is in the last abstract!!!\n"
             total+=i
             total+="\n"
+        total+="This was the end of your memory now follows the prompt\n"
         total= total+text
         result = self.LLM.prompt(total)
         self.add_memory(text) #add input to memory
         self.add_memory(result) #add output to memory
         return result
     
+    def decidesandtweets(self):
+        conn = sqlite3.connect('twitter.db')
+        c = conn.cursor()
+        question="""According to your background and your recent twitter behavior, decide if you want to tweet something or not. 
+                The likelyhood of tweeting should be around 10%.
+                The more often you dont tweet the more likely you should tweet.
+                If you decide to tweet, just answer with 'tweet' if you decide not to tweet answer with 'dont tweet'
+                Dont return anything else your answer should really just be 'tweet' or 'dont tweet'."""
+        res = self.LLM.prompt(question)
+        #if res is tweet then tweet it and add to database
+        if res=="tweet":
+            tweet=self.tweet()
+            #get the highest tweetid and add 1 to it to get the new tweetid
+            tweetid=c.execute("SELECT MAX(tweet_id) FROM tweets").fetchone()[0]+1
+            #add tweet to database
+            c.execute("INSERT INTO tweets Values (:tweet_id, :user_id, :tweettext, :likes",
+                  {'tweet_id':tweetid,'user_id':self.userid,'tweettext':tweet,'likes':0})
+        conn.commit()
+        
+        
     #prompts a generic tweet
     def tweet(self)->str:
         standardtweet="""This is your prompt: Please make a twitter tweet according to your background and memory.
