@@ -14,6 +14,7 @@ def createdatatables():
     # create user table
     c.execute("""CREATE TABLE users (
             user_id integer primary key,
+            username text,  
             age integer,
             gender text,
             nationality text,
@@ -23,9 +24,21 @@ def createdatatables():
             politicalcompass text
             )""")
     
+    #create follower table
+    c.execute("""CREATE TABLE followers (
+            follower_id integer,
+            follower_username text,  
+            followered_id integer,
+            followered_username text,  
+            FOREIGN KEY (follower_id) REFERENCES users (user_id),
+            FOREIGN KEY (followered_id) REFERENCES users (user_id)
+            PRIMARY KEY (follower_id, followered_id)
+            )""")
+    
     # create tweets table
     c.execute("""CREATE TABLE tweets (
             tweet_id integer primary key,
+            username text,  
             user_id integer,  
             tweettext text,
             likes integer,
@@ -36,9 +49,12 @@ def createdatatables():
 
     c.execute("""CREATE TABLE comments (
             comment_id integer primary key,
+            username text,  
             user_id integer,
-            tweet_id integer,        
+            tweet_id integer,
+            tweet_author_id integer,            
             commenttext text,
+            FOREIGN KEY (tweet_author_id) REFERENCES users (user_id),  
             FOREIGN KEY (user_id) REFERENCES users (user_id),
             FOREIGN KEY (tweet_id) REFERENCES tweets (tweet_id)    
             )""")

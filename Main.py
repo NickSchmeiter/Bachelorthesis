@@ -26,13 +26,14 @@ import sqlite3
 # sowohl mehr research als auch frei schnautze probieren. 
 #  
 
-ageslist=[26,27]
-genderlist=["male","female"]
-nationalitylist=["Germany","half italian, quarter japanese, quarter peruvian"]
-joblist=["computer science student","marketing at edgless systems(Berliner startup for cybersecurity)"]
-interestlist=["Skateboarding","books, food, photography"]
-locationlist=["Berlin","Berlin"]
-politicalcompasslist=["leftliberal","leftliberal"]
+ageslist=[26,27,62]
+usernamelist=["nickidarko","laralaske","orangerieneersen"]
+genderlist=["male","female","male"]
+nationalitylist=["Germany","half italian, quarter japanese, quarter peruvian","Germany"]
+joblist=["computer science student","marketing at edgless systems(Berliner startup for cybersecurity)","Self organised Ice cream seller"]
+interestlist=["Skateboarding","books, food, photography","Soccer, EDM, Newspaper"]
+locationlist=["Berlin","Berlin","Düsseldorf"]
+politicalcompasslist=["leftliberal","leftliberal","leftliberal"]
 agentlist=[]
 
 #create all users which are given in the lists
@@ -41,38 +42,25 @@ def createagents():
     c = conn.cursor()
     for i in range(len(ageslist)):
         
-        agentlist.append(agents(userid=i,age=ageslist[i],gender=genderlist[i],nationality=nationalitylist[i],job=joblist[i],interest=interestlist[i],location=locationlist[i],politicalcompass=politicalcompasslist[i]))
+        agentlist.append(agents(userid=i,username=usernamelist[i],age=ageslist[i],gender=genderlist[i],nationality=nationalitylist[i],job=joblist[i],interest=interestlist[i],location=locationlist[i],politicalcompass=politicalcompasslist[i]))
         agentlist[i].setbackground()
-        #safe agent data in database
-        c.execute("INSERT INTO users Values (:userid, :age, :gender, :nationality, :job, :interest, :location, :politicalcompass)",
-                  {'userid':agentlist[i].userid,'age':agentlist[i].age,'gender':agentlist[i].gender,'nationality':agentlist[i].nationality,'job':agentlist[i].job,'interest':agentlist[i].interest,'location':agentlist[i].location,'politicalcompass':agentlist[i].politicalcompass})
+        #save agent data in database
+        c.execute("INSERT INTO users Values (:userid, :username, :age, :gender, :nationality, :job, :interest, :location, :politicalcompass)",
+                  {'userid':agentlist[i].userid,'username':agentlist[i].username,'age':agentlist[i].age,'gender':agentlist[i].gender,'nationality':agentlist[i].nationality,'job':agentlist[i].job,'interest':agentlist[i].interest,'location':agentlist[i].location,'politicalcompass':agentlist[i].politicalcompass})
         conn.commit()
     conn.close()                     
 
 
-
-
-def showalltweetstoagentandlikes(agent:agents):
-    conn = sqlite3.connect('twitter.db')
-    c = conn.cursor()
-    tweetlist = c.execute("SELECT tweet_id, tweettext, likes FROM tweets WHERE user_id != :user_id", {'user_id': agent.userid}).fetchall()
-    for tweet in tweetlist:
-        tweet_id, tweettext, likes = tweet
-        if agent.evaluatetweet(tweettext) == "like":
-            new_likes = likes + 1
-            c.execute("UPDATE tweets SET likes = :new_likes WHERE tweet_id = :tweet_id", {'new_likes': new_likes, 'tweet_id': tweet_id})
-            conn.commit()
-    conn.close()
-
 def main():
     database.createdatatables()
     createagents()
-    days=2
-    for agent in agentlist:
-        for i in range(5*days):
-            agent.decidesandtweets()
-    for agent in agentlist:
-        agent.showalltweetstoagentandlikes()
+    days=6
+    for day in range(days):
+        for agent in agentlist:
+            for i in range(5):
+                agent.decidesandtweets()
+        for agent in agentlist:
+            agent.showalltweetstoagent()
 
 
 main()
