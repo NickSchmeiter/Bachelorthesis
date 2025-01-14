@@ -25,7 +25,7 @@ class agents(object):
     #sets background for the agent so agent get context for what he can tweet about 
     # and adds it to memory of the agent
     def setbackground(self):
-        backgroundtext="Imagine you are a Twitter user with the following background. This is your background.Youre Username is " +self.username+ "You are a " +str(self.age)+ " years old, your gender is "+self.gender+" youre nationality is "+self.nationality+" and your job is "+self.job+" your interest is "+self.interest
+        backgroundtext="Imagine you are a Twitter user with the following background. This is your background. Your Username is " +self.username+ "You are a " +str(self.age)+ " years old, your gender is "+self.gender+" youre nationality is "+self.nationality+" and your occupation is "+self.job+" your interest is "+self.interest
         backgroundtext=backgroundtext+" You are currently located in "+self.location+" and your political compass is "+self.politicalcompass
         self.add_memory("background",backgroundtext)
 
