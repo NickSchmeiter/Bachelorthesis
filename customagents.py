@@ -15,7 +15,7 @@ class agents(object):
         self.politicalcompass = politicalcompass    
         self.memory={"followings":["Users you follow:"],
                     "tweets":["Your Tweets:"],
-                    "likes": ["Tweet Liked:"],
+                    "likes": ["Tweets Liked:"],
                     "comments":["Your Comments:"],
                     "background":["Your Background:"]
                     }
@@ -47,7 +47,7 @@ class agents(object):
         mem=self.get_memory()
         for key in mem.keys():
             for i in mem[key]:
-                total+=i
+                total+=str(i)
                 total+="\n"
         total+="This was your memory\n"
         total= total+text
@@ -80,8 +80,10 @@ class agents(object):
     def decidesandtweets(self):
         conn = sqlite3.connect('twitter.db')
         c = conn.cursor()
-
-        if random.random()<=0.4:
+        q="Do you wanna tweet anything? If yes just return 'yes' if you dont want to tweet return 'no' Think about your background and your recent twitter behavior."
+        res=self.prompt(q)
+        #if random.random()<0.4:
+        if res=="yes":
             tweet=self.tweet()
             #get the highest tweetid and add 1 to it to get the new tweetid
             tweetid=c.execute("SELECT MAX(tweet_id) FROM tweets").fetchone()[0]
@@ -111,10 +113,9 @@ class agents(object):
         prompt="""Please evaluate the tweet which will follow after this prompt.
                   You should evaluate if you would give the tweet a like from a twitter user perspective.
                   remember your background and memory and evaluate the tweet according to that.
-                  You can like each tweet just once if you have seen this tweet before please ignore it and dont like it.
+                  You can like each tweet just once.
                   This means if the tweet is in your memory as a like dont like it again.
                   If you would like the tweet, just return 'like' if you would not like the tweet return 'dislike'
-                  Dont return anything else your answer should really just be 'like' or 'dislike'.
                   HERE COMES THE TWEET: \n"""
         prompt=prompt+tweet
         res=self.prompt(prompt)
@@ -127,14 +128,38 @@ class agents(object):
     def showalltweetstoagent(self):
         conn = sqlite3.connect('twitter.db')
         c = conn.cursor()
-        tweetlist = c.execute("SELECT tweet_id, tweettext, likes, user_id, username FROM tweets WHERE user_id != :user_id", {'user_id': self.userid}).fetchall()
+        tweetlist = c.execute("""
+            SELECT tweet_id, tweettext, likes, user_id, username 
+            FROM tweets 
+            WHERE user_id IN (
+            SELECT followered_id 
+            FROM followers 
+            WHERE follower_id = :user_id
+            )
+            ORDER BY tweet_id DESC
+            LIMIT 10
+        """, {'user_id': self.userid}).fetchall()
+
+        if len(tweetlist) < 10:
+            additional_tweets = c.execute("""
+            SELECT tweet_id, tweettext, likes, user_id, username 
+            FROM tweets 
+            WHERE user_id NOT IN (
+                SELECT followered_id 
+                FROM followers 
+                WHERE follower_id = :user_id
+            ) AND user_id != :user_id
+            ORDER BY tweet_id DESC
+            LIMIT :limit
+            """, {'user_id': self.userid, 'limit': 10 - len(tweetlist)}).fetchall()
+            tweetlist.extend(additional_tweets)
         for tweet in tweetlist:
             tweet_id, tweettext, likes, tweetauthor , tweetauthorusername = tweet
             if self.evaluatetweettolike(tweettext) == "like":
                 new_likes = likes + 1
                 c.execute("UPDATE tweets SET likes = :new_likes WHERE tweet_id = :tweet_id", {'new_likes': new_likes, 'tweet_id': tweet_id})
-            if self.evaluatetweettocomment(tweettext) == "comment":
-                comment = self.getcomment(tweettext)
+            if tweet_id not in self.memory['comments'] and self.evaluatetweettocomment(tweettext) == "comment":
+                comment = self.getcomment(tweet_id, tweetauthorusername, tweettext)
                 commentid = c.execute("SELECT MAX(comment_id) FROM comments").fetchone()[0]
                 if commentid == None:
                     commentid = -1
@@ -158,13 +183,14 @@ class agents(object):
             res=self.prompt('your answer was not "comment" or "not comment" Please try again and just send an answer which is "comment" or "not comment"')
         return res
     
-    def getcomment(self,tweet)->str:
+    def getcomment(self,tweetid, tweetauthor,tweet)->str:
         prompt="""Please write your comment now. Your comment should be in english and should make sense according to the tweet. The comment should be realistic and not too long.
           It doesnt make sense to comment the same comment under multiple tweets. So if the comment is in your memory already dont comment the same one.
-          Just post the comment and nothing else. Nothing preeceding or following the comment.
+          Just post the comment and nothing else. Nothing preeceding or following the comment. Also you can mention the username of the tweet if you want.
         This is the tweet:\n"""
-        prompt=prompt+tweet
+        prompt=prompt+tweet+"This is the username of the tweet author: "+tweetauthor
         res=self.prompt(prompt)
+        self.add_memory("comments",tweetid)
         self.add_memory("comments",res)
         return res
 
