@@ -98,10 +98,14 @@ class agents(object):
     #prompts a generic tweet
     def tweet(self)->str:
         standardtweet="""This is your prompt: Please make a twitter tweet according to your background and memory.
-                      Your tweet should be as realistic as possible so dont overestimate your background.  
+                      Your tweet should be as realistic as possible so just refer to your background slightly.  
                       The tweet should be in english. The tweet should make sense according to your memory.
-                      Tweet like you are a heavy twitter user so dont focus too much on your background in each single tweet.
-
+                      If you refer to a topic from your background just focus on one topic not multiple.
+                      Also try that every tweet is distinct. The tweets should look different from the ones in your memory.
+                      Here are some examples of tweets:
+                      "No one is born hating another person because of the color of his skin or his background or his religion..."
+                      "I hope that even my worst critics remain on Twitter, because that is what free speech means"
+                      "Teamwork makes the dream work."
                       Remember tweets have a maximum of 280 characters
                       and usually they use hashtags # and mentions @. 
                       Just post the tweet and nothing else. Nothing preeceding or following the tweet."""
@@ -119,8 +123,12 @@ class agents(object):
                   HERE COMES THE TWEET: \n"""
         prompt=prompt+tweet
         res=self.prompt(prompt)
+        count=0 
         while res!="like" and res!="dislike":
             res=self.prompt(prompt+'your answer was too long please return just "like" or "dislike"')
+            count+=1
+            if count>3:
+                res="dislike"
         if res=="like":
             self.add_memory("likes",tweet)
         return res
@@ -179,8 +187,12 @@ class agents(object):
                     HERE COMES THE TWEET: \n"""
         prompt=prompt+tweet
         res=self.prompt(prompt)
+        count=0
         while res!="comment" and res!="not comment":
             res=self.prompt('your answer was not "comment" or "not comment" Please try again and just send an answer which is "comment" or "not comment"')
+            count+=1
+            if count>3:
+                res="not comment"
         return res
     
     def getcomment(self,tweetid, tweetauthor,tweet)->str:
@@ -205,8 +217,12 @@ class agents(object):
                   HERE COMES THE TWEET: \n"""
         prompt=prompt+tweet
         res=self.prompt(prompt)
+        count=0
         while res!="follow" and res!="not follow":
             res=self.prompt('your answer was not "follow" or "not follow" Please try again and just send an answer which is "follow" or "not follow"')
+            count+=1
+            if count>3:
+                res="not follow"
         if res=="follow":
             self.add_memory("followings",tweetauthorusername)
         return res

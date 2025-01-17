@@ -3,6 +3,7 @@ from langchain_ollama import OllamaLLM
 from customagents import agents
 import database
 import sqlite3
+import pandas as pd
 
 
 # Fragen an Hochstein: 
@@ -26,15 +27,20 @@ import sqlite3
 # sowohl mehr research als auch frei schnautze probieren. 
 #  
 
-ageslist=[26,27,62]
-usernamelist=["nickidarko","laralaske","orangerieneersen"]
-genderlist=["male","female","male"]
-nationalitylist=["Germany","half italian, quarter japanese, quarter peruvian","Germany"]
-joblist=["computer science student","marketing at edgless systems(Berliner startup for cybersecurity)","Self organised Ice cream seller"]
-interestlist=["Skateboarding","books, food, photography","Soccer, EDM, Newspaper"]
-locationlist=["Berlin","Berlin","Düsseldorf"]
-politicalcompasslist=["leftliberal","leftliberal","leftliberal"]
-agentlist=[]
+# Read data from Excel file
+file_path = '/Users/nickschmeiter/Downloads/Bachelorthesis/Users.xlsx'
+df = pd.read_excel(file_path)
+
+# Fill lists with data from the Excel file
+ageslist = df['age'].tolist()
+usernamelist = df['username'].tolist()
+genderlist = df['gender'].tolist()
+nationalitylist = df['nationality'].tolist()
+joblist = df['job'].tolist()
+interestlist = df['interest'].tolist()
+locationlist = df['location'].tolist()
+politicalcompasslist = df['politicalcompass'].tolist()
+agentlist = []
 
 #create all users which are given in the lists
 def createagents():
@@ -60,6 +66,8 @@ def main():
             agent.decidesandtweets()
         for agent in agentlist:
             agent.showalltweetstoagent()
+        print("1/3 Day finished")
+    print("Simulation finished")
 
 
 main()
