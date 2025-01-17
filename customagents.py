@@ -17,7 +17,8 @@ class agents(object):
                     "tweets":["Your Tweets:"],
                     "likes": ["Tweets Liked:"],
                     "comments":["Your Comments:"],
-                    "background":["Your Background:"]
+                    "background":["Your Background:"],
+                    "tweetstyle":["Your Tweetstyle:"]
                     }
         self.LLM=LLM(model=OllamaLLM(model="llama3.2"))
 
@@ -28,7 +29,15 @@ class agents(object):
         backgroundtext="Imagine you are a Twitter user with the following background. This is your background. Your Username is " +self.username+ "You are a " +str(self.age)+ " years old, your gender is "+self.gender+" youre nationality is "+self.nationality+" and your occupation is "+self.job+" your interest is "+self.interest
         backgroundtext=backgroundtext+" You are currently located in "+self.location+" and your political compass is "+self.politicalcompass
         self.add_memory("background",backgroundtext)
-
+    
+    def gettweetstyles(self)->str:
+        return self.prompt("Please provide 5 different styles of tweets. Just give back the different styles with one example each nothing else.")
+    
+    #tweetstyle set and decision
+    def settweetstyle(self,givenstyles:str):
+        decideonstyle="Please decide on a tweetstyle. Use your background and think what would make the most sense. Answer with the tweetstyle and two example tweets according to the style"
+        style=self.prompt(givenstyles+decideonstyle)
+        self.add_memory("tweetstyle",style)
 
     #adds string to memorydictionary so agent can recall it later
     def add_memory(self, key, text):
@@ -100,6 +109,7 @@ class agents(object):
         standardtweet="""This is your prompt: Please make a twitter tweet according to your background and memory.
                       Your tweet should be as realistic as possible so just refer to your background slightly.  
                       The tweet should be in english. The tweet should make sense according to your memory.
+                      Focus on the tweetstyle you decided on. Tweet according to that style.
                       If you refer to a topic from your background just focus on one topic not multiple.
                       Also try that every tweet is distinct. The tweets should look different from the ones in your memory.
                       Here are some examples of tweets:

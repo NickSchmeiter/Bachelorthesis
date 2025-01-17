@@ -49,7 +49,9 @@ def createagents():
     for i in range(len(ageslist)):
         
         agentlist.append(agents(userid=i,username=usernamelist[i],age=ageslist[i],gender=genderlist[i],nationality=nationalitylist[i],job=joblist[i],interest=interestlist[i],location=locationlist[i],politicalcompass=politicalcompasslist[i]))
+        styles=agentlist[i].gettweetstyles()
         agentlist[i].setbackground()
+        agentlist[i].settweetstyle(styles)
         #save agent data in database
         c.execute("INSERT INTO users Values (:userid, :username, :age, :gender, :nationality, :job, :interest, :location, :politicalcompass)",
                   {'userid':agentlist[i].userid,'username':agentlist[i].username,'age':agentlist[i].age,'gender':agentlist[i].gender,'nationality':agentlist[i].nationality,'job':agentlist[i].job,'interest':agentlist[i].interest,'location':agentlist[i].location,'politicalcompass':agentlist[i].politicalcompass})
@@ -60,7 +62,7 @@ def createagents():
 def main():
     database.createdatatables()
     createagents()
-    days=2
+    days=1
     for day in range(3*days):
         for agent in agentlist:
             agent.decidesandtweets()
