@@ -62,7 +62,7 @@ def createagents():
 def main():
     database.createdatatables()
     createagents()
-    days=1
+    days=2
     for day in range(3*days):
         for agent in agentlist:
             agent.decidesandtweets()
