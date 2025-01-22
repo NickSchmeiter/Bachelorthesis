@@ -209,7 +209,7 @@ class agents(object):
         prompt="""Please write your comment now. Your comment should be in english and should make sense according to the tweet. The comment should be realistic and not too long.
           It doesnt make sense to comment the same comment under multiple tweets. So if the comment is in your memory already dont comment the same one.
           Just post the comment and nothing else. Nothing preeceding or following the comment. Also you can mention the username of the tweet if you want.
-        This is the tweet:\n"""
+          HERE COMES THE TWEET:\n"""
         prompt=prompt+tweet+"This is the username of the tweet author: "+tweetauthor
         res=self.prompt(prompt)
         self.add_memory("comments",tweetid)

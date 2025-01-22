@@ -28,7 +28,7 @@ import pandas as pd
 #  
 
 # Read data from Excel file
-file_path = '/Users/nickschmeiter/Downloads/Bachelorthesis/Users.xlsx'
+file_path = '/Users/nickschmeiter/Downloads/Bachelorthesis/Users1.xlsx'
 df = pd.read_excel(file_path)
 
 # Fill lists with data from the Excel file
