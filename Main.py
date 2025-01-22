@@ -28,7 +28,7 @@ import pandas as pd
 #  
 
 # Read data from Excel file
-file_path = '/Users/nickschmeiter/Downloads/Bachelorthesis/Users1.xlsx'
+file_path = '/Users/nickschmeiter/Downloads/Bachelorthesis/Users.xlsx'
 df = pd.read_excel(file_path)
 
 # Fill lists with data from the Excel file
@@ -53,8 +53,9 @@ def createagents():
         agentlist[i].setbackground()
         agentlist[i].settweetstyle(styles)
         #save agent data in database
-        c.execute("INSERT INTO users Values (:userid, :username, :age, :gender, :nationality, :job, :interest, :location, :politicalcompass)",
-                  {'userid':agentlist[i].userid,'username':agentlist[i].username,'age':agentlist[i].age,'gender':agentlist[i].gender,'nationality':agentlist[i].nationality,'job':agentlist[i].job,'interest':agentlist[i].interest,'location':agentlist[i].location,'politicalcompass':agentlist[i].politicalcompass})
+        c.execute("INSERT INTO users Values (:userid, :username, :age, :gender, :nationality, :job, :interest, :location, :politicalcompass, :tweetstyle)",
+                  {'userid':agentlist[i].userid,'username':agentlist[i].username,'age':agentlist[i].age,'gender':agentlist[i].gender,'nationality':agentlist[i].nationality,'job':agentlist[i].job,
+                   'interest':agentlist[i].interest,'location':agentlist[i].location,'politicalcompass':agentlist[i].politicalcompass,'tweetstyle':agentlist[i].memory["tweetstyle"][1]})
         conn.commit()
     conn.close()                     
 

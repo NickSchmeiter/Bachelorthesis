@@ -21,7 +21,8 @@ def createdatatables():
             job text,
             interest text,
             location text,
-            politicalcompass text
+            politicalcompass text,
+            tweetstyle text  
             )""")
     
     #create follower table

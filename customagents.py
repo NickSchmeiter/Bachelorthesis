@@ -39,6 +39,7 @@ class agents(object):
         style=self.prompt(givenstyles+decideonstyle)
         self.add_memory("tweetstyle",style)
 
+
     #adds string to memorydictionary so agent can recall it later
     def add_memory(self, key, text):
         self.memory[key].append(text)
